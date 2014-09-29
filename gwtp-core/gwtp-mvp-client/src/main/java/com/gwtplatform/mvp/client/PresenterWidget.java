@@ -202,7 +202,7 @@ public abstract class PresenterWidget<V extends View> extends HandlerContainerIm
             PresenterWidget<?> child = it.next();
             if (child.slot == slot) {
                 it.remove();
-                child.orphan();
+                child.orphan(false);
             }
         }
         getView().setInSlot(slot, null);
@@ -287,7 +287,7 @@ public abstract class PresenterWidget<V extends View> extends HandlerContainerIm
             getView().removeFromSlot(slot, child);
         }
 
-        child.orphan();
+        child.orphan(true);
     }
 
     @Override
@@ -309,7 +309,7 @@ public abstract class PresenterWidget<V extends View> extends HandlerContainerIm
             PresenterWidget<?> nextChild = it.next();
             if (nextChild != child && nextChild.slot == slot) {
                 it.remove();
-                nextChild.orphan();
+                nextChild.orphan(false);
             }
         }
 
@@ -554,11 +554,13 @@ public abstract class PresenterWidget<V extends View> extends HandlerContainerIm
     /**
      * Disconnects a child from its parent.
      */
-    private void orphan() {
+    private void orphan(boolean removeFromParentSet) {
         if (parent != null) {
             internalHide();
 
-            parent.children.remove(this);
+            if (removeFromParentSet) {
+                parent.children.remove(this);
+            }
             parent = null;
         }
         slot = null;
